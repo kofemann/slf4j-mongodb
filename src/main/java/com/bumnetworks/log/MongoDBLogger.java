@@ -41,7 +41,10 @@ public class MongoDBLogger extends MarkerIgnoringBase {
         try {
             mongo = new Mongo(props.getProperty("slf4j.mongodb.mongo.host", "localhost"),
                               new Integer(props.getProperty("slf4j.mongodb.mongo.port", "27017")).intValue());
-            db = mongo.getDB(props.getProperty("slf4j.mongodb.mongo.database", "log." + name));
+            String dbName = props.getProperty("slf4j.mongodb.mongo.database", "");
+            if (dbName.equals(""))
+                throw new IllegalArgumentException("please define 'slf4j.mongodb.mongo.database' in your props file");
+            db = mongo.getDB(dbName);
         }
         catch (Throwable t) { throw new RuntimeException(t); }
     }
@@ -75,11 +78,11 @@ public class MongoDBLogger extends MarkerIgnoringBase {
             message = message + " " + sw.toString();
         }
         DBObject o = BasicDBObjectBuilder
-            .start("level", level.toString())
-            .add("message", message)
+            .start("message", message)
             .add("time", new Date())
+            .add("name", name)
             .get();
-        db.getCollection("log").insert(o);
+        getColl(level).insert(o);
     }
 
     public boolean isTraceEnabled() {
@@ -199,5 +202,11 @@ public class MongoDBLogger extends MarkerIgnoringBase {
 
     public void error(String msg, Throwable t) {
         log(Level.ERROR, msg, t);
+    }
+
+    public Mongo getMongo() { return mongo; }
+    public DB getDB() { return db; }
+    public DBCollection getColl(Level level) {
+        return getDB().getCollection("level." + level.toString());
     }
 }
