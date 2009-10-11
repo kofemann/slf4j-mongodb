@@ -36,7 +36,7 @@ public class MathTest {
         Map<MongoDBLogger.Level, Integer> counts
             = new HashMap<MongoDBLogger.Level, Integer>();
         for (MongoDBLogger.Level l : MongoDBLogger.Level.values())
-            counts.put(l, rand.nextInt(100));
+            counts.put(l, rand.nextInt(10000) + 1);
 
         for (MongoDBLogger.Level l : counts.keySet())
             for (int i = 1; i <= counts.get(l); i++)
