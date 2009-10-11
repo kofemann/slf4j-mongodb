@@ -7,7 +7,7 @@ import com.bumnetworks.log.*;
 
 /**
    Ruthlessly ripped out of slf4j-simple.
- */
+*/
 public class StaticLoggerBinder implements LoggerFactoryBinder {
     private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
     public static final StaticLoggerBinder getSingleton() { return SINGLETON; }
