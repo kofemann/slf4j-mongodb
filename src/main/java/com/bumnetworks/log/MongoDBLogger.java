@@ -54,28 +54,30 @@ public class MongoDBLogger extends MarkerIgnoringBase {
         return levels.get(Level.valueOf(level));
     }
 
-    private void formatAndLog(String level, String format, Object arg1, Object arg2) {
+    private void formatAndLog(Level level, String format, Object arg1, Object arg2) {
         String message = MessageFormatter.format(format, arg1, arg2);
         log(level, message);
     }
 
-    private void formatAndLog(String level, String format, Object[] argArray) {
+    private void formatAndLog(Level level, String format, Object[] argArray) {
         String message = MessageFormatter.arrayFormat(format, argArray);
         log(level, message);
     }
 
-    private void log(String level, String message) {
+    private void log(Level level, String message) {
         log(level, message, null);
     }
 
-    private void log(String level, String message, Throwable t) {
+    private void log(Level level, String message, Throwable t) {
         if (t != null) {
             StringWriter sw = new StringWriter();
             t.printStackTrace(new PrintWriter(sw));
             message = message + " " + sw.toString();
         }
-        DBObject o = BasicDBObjectBuilder.start("level", level)
-            .add("message", message).add("time", new Date())
+        DBObject o = BasicDBObjectBuilder
+            .start("level", level.toString())
+            .add("message", message)
+            .add("time", new Date())
             .get();
         db.getCollection("log").insert(o);
     }
@@ -85,23 +87,23 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     }
 
     public void trace(String msg) {
-        log("TRACE", msg, null);
+        log(Level.TRACE, msg, null);
     }
 
     public void trace(String format, Object arg) {
-        formatAndLog("TRACE", format, arg, null);
+        formatAndLog(Level.TRACE, format, arg, null);
     }
 
     public void trace(String format, Object arg1, Object arg2) {
-        formatAndLog("TRACE", format, arg1, arg2);
+        formatAndLog(Level.TRACE, format, arg1, arg2);
     }
 
     public void trace(String format, Object[] argArray) {
-        formatAndLog("TRACE", format, argArray);
+        formatAndLog(Level.TRACE, format, argArray);
     }
 
     public void trace(String msg, Throwable t) {
-        log("TRACE", msg, t);
+        log(Level.TRACE, msg, t);
     }
 
     public boolean isDebugEnabled() {
@@ -109,23 +111,23 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     }
 
     public void debug(String msg) {
-        log("DEBUG", msg, null);
+        log(Level.DEBUG, msg, null);
     }
 
     public void debug(String format, Object arg) {
-        formatAndLog("DEBUG", format, arg, null);
+        formatAndLog(Level.DEBUG, format, arg, null);
     }
 
     public void debug(String format, Object arg1, Object arg2) {
-        formatAndLog("DEBUG", format, arg1, arg2);
+        formatAndLog(Level.DEBUG, format, arg1, arg2);
     }
 
     public void debug(String format, Object[] argArray) {
-        formatAndLog("DEBUG", format, argArray);
+        formatAndLog(Level.DEBUG, format, argArray);
     }
 
     public void debug(String msg, Throwable t) {
-        log("DEBUG", msg, t);
+        log(Level.DEBUG, msg, t);
     }
 
     public boolean isInfoEnabled() {
@@ -133,23 +135,23 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     }
 
     public void info(String msg) {
-        log("INFO", msg, null);
+        log(Level.INFO, msg, null);
     }
 
     public void info(String format, Object arg) {
-        formatAndLog("INFO", format, arg, null);
+        formatAndLog(Level.INFO, format, arg, null);
     }
 
     public void info(String format, Object arg1, Object arg2) {
-        formatAndLog("INFO", format, arg1, arg2);
+        formatAndLog(Level.INFO, format, arg1, arg2);
     }
 
     public void info(String format, Object[] argArray) {
-        formatAndLog("INFO", format, argArray);
+        formatAndLog(Level.INFO, format, argArray);
     }
 
     public void info(String msg, Throwable t) {
-        log("INFO", msg, t);
+        log(Level.INFO, msg, t);
     }
 
     public boolean isWarnEnabled() {
@@ -157,22 +159,22 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     }
 
     public void warn(String msg) {
-        log("WARN", msg, null);
+        log(Level.WARN, msg, null);
     }
 
     public void warn(String format, Object arg) {
-        formatAndLog("WARN", format, arg, null);
+        formatAndLog(Level.WARN, format, arg, null);
     }
 
     public void warn(String format, Object arg1, Object arg2) {
-        formatAndLog("WARN", format, arg1, arg2);
+        formatAndLog(Level.WARN, format, arg1, arg2);
     }
 
     public void warn(String format, Object[] argArray) {
-        formatAndLog("WARN", format, argArray);
+        formatAndLog(Level.WARN, format, argArray);
     }
     public void warn(String msg, Throwable t) {
-        log("WARN", msg, t);
+        log(Level.WARN, msg, t);
     }
 
     public boolean isErrorEnabled() {
@@ -180,22 +182,22 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     }
 
     public void error(String msg) {
-        log("ERROR", msg, null);
+        log(Level.ERROR, msg, null);
     }
 
     public void error(String format, Object arg) {
-        formatAndLog("ERROR", format, arg, null);
+        formatAndLog(Level.ERROR, format, arg, null);
     }
 
     public void error(String format, Object arg1, Object arg2) {
-        formatAndLog("ERROR", format, arg1, arg2);
+        formatAndLog(Level.ERROR, format, arg1, arg2);
     }
 
     public void error(String format, Object[] argArray) {
-        formatAndLog("ERROR", format, argArray);
+        formatAndLog(Level.ERROR, format, argArray);
     }
 
     public void error(String msg, Throwable t) {
-        log("ERROR", msg, t);
+        log(Level.ERROR, msg, t);
     }
 }
