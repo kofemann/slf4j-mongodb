@@ -77,12 +77,27 @@ public class MongoDBLogger extends MarkerIgnoringBase {
             t.printStackTrace(new PrintWriter(sw));
             message = message + " " + sw.toString();
         }
-        DBObject o = BasicDBObjectBuilder
+        StackTraceElement caller = getCaller();
+        BasicDBObjectBuilder builder = BasicDBObjectBuilder
             .start("message", message)
             .add("time", new Date())
-            .add("name", name)
-            .get();
-        getColl(level).insert(o);
+            .add("file", caller.getFileName())
+            .add("line", caller.getLineNumber())
+            .add("method", caller.getMethodName())
+            .add("class", caller.getClassName());
+        getColl(level).insert(builder.get());
+    }
+
+    private StackTraceElement getCaller() {
+        try {
+            throw new Throwable();
+        }
+        catch (Throwable t) {
+            for (StackTraceElement frame : t.getStackTrace())
+                if (frame.getClassName().equals(name))
+                    return frame;
+        }
+        return null;
     }
 
     public boolean isTraceEnabled() {
