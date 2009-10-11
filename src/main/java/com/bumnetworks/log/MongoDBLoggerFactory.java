@@ -6,6 +6,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.ILoggerFactory;
 
+/**
+   Ruthlessly ripped out of slf4j-simple.
+*/
 public class MongoDBLoggerFactory implements ILoggerFactory {
 
     final static MongoDBLoggerFactory INSTANCE = new MongoDBLoggerFactory();
