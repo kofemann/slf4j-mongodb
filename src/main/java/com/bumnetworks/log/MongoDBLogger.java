@@ -7,6 +7,10 @@ import org.slf4j.helpers.MarkerIgnoringBase;
 import org.slf4j.helpers.MessageFormatter;
 
 public class MongoDBLogger extends MarkerIgnoringBase {
+    public enum Level {
+        TRACE, DEBUG, INFO, WARN, ERROR;
+    }
+
     private static final long serialVersionUID = -6560244151660620173L;
 
     private static final String DEFAULT_PROPS = "slf4j-mongodb.properties";
@@ -25,20 +29,29 @@ public class MongoDBLogger extends MarkerIgnoringBase {
         }
     }
 
-    private boolean trace, debug, info, warn, error;
+    private Map<Level,Boolean> levels;
     private Mongo mongo;
     private DB db;
 
     public MongoDBLogger(String name) {
+        levels = new HashMap<Level,Boolean>();
+        for (Level level : Level.values())
+            levels.put(level, true);
         this.name = name;
-        trace = debug = info = warn = error
-            = true;
         try {
             mongo = new Mongo(props.getProperty("slf4j.mongodb.mongo.host", "localhost"),
                               new Integer(props.getProperty("slf4j.mongodb.mongo.port", "27017")).intValue());
             db = mongo.getDB(props.getProperty("slf4j.mongodb.mongo.database", "log." + name));
         }
         catch (Throwable t) { throw new RuntimeException(t); }
+    }
+
+    private boolean isLevelEnabled(Level level) {
+        return levels.get(level);
+    }
+
+    private boolean isLevelEnabled(String level) {
+        return levels.get(Level.valueOf(level));
     }
 
     private void formatAndLog(String level, String format, Object arg1, Object arg2) {
@@ -68,45 +81,55 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     }
 
     public boolean isTraceEnabled() {
-        return trace;
+        return isLevelEnabled(Level.TRACE);
     }
 
     public void trace(String msg) {
+        log("TRACE", msg, null);
     }
 
-    public void trace(String format, Object param1) {
+    public void trace(String format, Object arg) {
+        formatAndLog("TRACE", format, arg, null);
     }
 
-    public void trace(String format, Object param1, Object param2) {
+    public void trace(String format, Object arg1, Object arg2) {
+        formatAndLog("TRACE", format, arg1, arg2);
     }
 
     public void trace(String format, Object[] argArray) {
+        formatAndLog("TRACE", format, argArray);
     }
 
     public void trace(String msg, Throwable t) {
+        log("TRACE", msg, t);
     }
 
     public boolean isDebugEnabled() {
-        return debug;
+        return isLevelEnabled(Level.DEBUG);
     }
 
     public void debug(String msg) {
+        log("DEBUG", msg, null);
     }
 
-    public void debug(String format, Object param1) {
+    public void debug(String format, Object arg) {
+        formatAndLog("DEBUG", format, arg, null);
     }
 
-    public void debug(String format, Object param1, Object param2) {
+    public void debug(String format, Object arg1, Object arg2) {
+        formatAndLog("DEBUG", format, arg1, arg2);
     }
 
     public void debug(String format, Object[] argArray) {
+        formatAndLog("DEBUG", format, argArray);
     }
 
     public void debug(String msg, Throwable t) {
+        log("DEBUG", msg, t);
     }
 
     public boolean isInfoEnabled() {
-        return info;
+        return isLevelEnabled(Level.INFO);
     }
 
     public void info(String msg) {
@@ -130,7 +153,7 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     }
 
     public boolean isWarnEnabled() {
-        return warn;
+        return isLevelEnabled(Level.WARN);
     }
 
     public void warn(String msg) {
@@ -153,7 +176,7 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     }
 
     public boolean isErrorEnabled() {
-        return error;
+        return isLevelEnabled(Level.ERROR);
     }
 
     public void error(String msg) {
