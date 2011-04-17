@@ -1,8 +1,11 @@
 package com.bumnetworks.log;
 
+import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.Mongo;
 import java.io.*;
 import java.util.*;
-import com.mongodb.*;
 import org.slf4j.helpers.MarkerIgnoringBase;
 import org.slf4j.helpers.MessageFormatter;
 
@@ -34,15 +37,15 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     private DB db;
 
     public MongoDBLogger(String name) {
-        levels = new HashMap<Level,Boolean>();
+        levels = new EnumMap<Level,Boolean>(Level.class);
         for (Level level : Level.values())
             levels.put(level, true);
         this.name = name;
         try {
             mongo = new Mongo(props.getProperty("slf4j.mongodb.mongo.host", "localhost"),
-                              new Integer(props.getProperty("slf4j.mongodb.mongo.port", "27017")).intValue());
+                    Integer.parseInt(props.getProperty("slf4j.mongodb.mongo.port", "27017")));
             String dbName = props.getProperty("slf4j.mongodb.mongo.database", "");
-            if (dbName.equals(""))
+            if (dbName.length() == 0)
                 throw new IllegalArgumentException("please define 'slf4j.mongodb.mongo.database' in your props file");
             db = mongo.getDB(dbName);
         }
@@ -58,12 +61,12 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     }
 
     private void formatAndLog(Level level, String format, Object arg1, Object arg2) {
-        String message = MessageFormatter.format(format, arg1, arg2);
+        String message = MessageFormatter.format(format, arg1, arg2).getMessage();
         log(level, message);
     }
 
     private void formatAndLog(Level level, String format, Object[] argArray) {
-        String message = MessageFormatter.arrayFormat(format, argArray);
+        String message = MessageFormatter.arrayFormat(format, argArray).getMessage();
         log(level, message);
     }
 

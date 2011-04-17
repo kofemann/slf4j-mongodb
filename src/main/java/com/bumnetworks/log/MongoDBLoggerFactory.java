@@ -13,17 +13,13 @@ public class MongoDBLoggerFactory implements ILoggerFactory {
 
     final static MongoDBLoggerFactory INSTANCE = new MongoDBLoggerFactory();
 
-    Map loggerMap;
-
-    public MongoDBLoggerFactory() {
-        loggerMap = new HashMap();
-    }
+    final Map<String, Logger> loggerMap =  new HashMap<String, Logger>();
 
     public Logger getLogger(String name) {
         Logger slogger = null;
         // protect against concurrent access of the loggerMap
         synchronized (this) {
-            slogger = (Logger) loggerMap.get(name);
+            slogger = loggerMap.get(name);
             if (slogger == null) {
                 slogger = new MongoDBLogger(name);
                 loggerMap.put(name, slogger);
