@@ -92,13 +92,10 @@ public class MongoDBLogger extends MarkerIgnoringBase {
     }
 
     private StackTraceElement getCaller() {
-        try {
-            throw new Throwable();
-        }
-        catch (Throwable t) {
-            for (StackTraceElement frame : t.getStackTrace())
-                if (frame.getClassName().equals(name))
-                    return frame;
+        for (StackTraceElement frame : new Throwable().getStackTrace()) {
+            if (frame.getClassName().equals(name)) {
+                return frame;
+            }
         }
         return null;
     }
